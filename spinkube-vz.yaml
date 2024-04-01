@@ -139,6 +139,11 @@ provision:
     mkdir -p {{.Home}}/.kube
     cp -f $KUBECONFIG {{.Home}}/.kube/config
     chown -R {{.User}} {{.Home}}/.kube
+
+###
+# Install spin-operator and dependencies
+# (Optional): You can also run these commands manually
+###
 - mode: user
   script: |
     #!/bin/bash
@@ -150,6 +155,11 @@ provision:
     kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0/spin-operator.crds.yaml
     kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0/spin-operator.runtime-class.yaml
     kubectl apply -f https://github.com/spinkube/spin-operator/releases/download/v0.1.0/spin-operator.shim-executor.yaml
+
+###
+# Setup local volumes for persistent storage
+# (Optional): You can also run these commands manually
+###
 
 probes:
 - description: "kubeadm to be installed"
@@ -200,4 +210,14 @@ message: |
   ------
   export KUBECONFIG="{{.Dir}}/copied-from-guest/kubeconfig.yaml"
   kubectl ...
+  ------
+  To install the `spin-operator` on the k8s instance, run the following commands:
+  NOTE: all pre-requisites have been installed (i.e. containerd-shim-spin, runtimeclass, spinappexecutor, cert-manager)
+  ------
+  helm upgrade --install spin-operator \
+    --namespace spin-operator \
+    --create-namespace \
+    --version 0.1.0 \
+    --wait \
+    oci://ghcr.io/spinkube/charts/spin-operator
   ------
